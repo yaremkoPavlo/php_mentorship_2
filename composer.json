@@ -1,0 +1,9 @@
+{
+    "name": "homework_01",
+    "description": "homework",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
