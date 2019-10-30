@@ -4,7 +4,7 @@ namespace App;
 
 class ImageGIF extends Image
 {
-    protected function renderImage( $image): bool
+    protected function renderImage($image): bool
     {
         return imagegif($image);
     }

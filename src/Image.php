@@ -28,23 +28,23 @@ abstract class Image
 
     /**
      * @param string Path to file.
-     * 
+     *
      * @return Image Instance of Image
      */
     public static function load(string $imgPath): Image
     {
         $fileExtentions = self::getFileExtention($imgPath);
-        if ( class_exists($imgclass = 'App\Image' . $fileExtentions)) {
+        if (class_exists($imgclass = 'App\Image' . $fileExtentions)) {
             return new $imgclass(WORKING_DIR . $imgPath);
         }
     }
 
     /**
      * Resize image and render to browser
-     * 
+     *
      * @param int $height
      * @param int $width
-     * 
+     *
      * @return bool
      */
     public function resizeImg(int $width, int $height): bool
@@ -61,9 +61,9 @@ abstract class Image
 
     /**
      * Return file extentions.
-     * 
+     *
      * @param string $imgPath
-     * 
+     *
      * @return string
      */
     public static function getFileExtention($imgPath): string
