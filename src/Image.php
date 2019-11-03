@@ -5,17 +5,23 @@ namespace App;
 abstract class Image
 {
     /**
-     * @property resource Resource to loaded image.
+     * Resource to loaded image.
+     *
+     * @property resource
      */
     protected $image;
 
     /**
-     * @property array Contain atributes of image width.
+     * Contain image atributes such a width, height, mimetype.
+     *
+     * @property array
      */
     protected $atributes;
 
     /**
-     * @property string Fool path to image.
+     * Full path to image.
+     *
+     * @property string
      */
     protected $imagePath;
 
@@ -27,16 +33,22 @@ abstract class Image
     }
 
     /**
-     * @param string Path to file.
+     * Static factory method, that create instatnce of Image child.
      *
-     * @return Image Instance of Image
+     * @param string Full path to file.
+     *
+     * @return Image Instance of Image child class.
+     *
+     * @trow \Exception
      */
-    public static function load(string $imgPath): Image
+    final public static function load(string $imgPath): Image
     {
         $fileExtentions = self::getFileExtention($imgPath);
-        if (class_exists($imgclass = 'App\Image' . $fileExtentions)) {
-            return new $imgclass(WORKING_DIR . $imgPath);
+        if (!class_exists($imgclass = 'App\Image' . $fileExtentions)) {
+            throw new \Exception("Can't support files with '{$fileExtentions}' extentions.");
         }
+
+        return new $imgclass($imgPath);
     }
 
     /**
@@ -45,18 +57,30 @@ abstract class Image
      * @param int $height
      * @param int $width
      *
-     * @return bool
+     * @return Image $this
      */
-    public function resizeImg(int $width, int $height): bool
+    public function resizeImg(int $width, int $height): Image
     {
         $image = $this->image;
         if ($width !== $this->atributes[0] && $height !== $this->atributes[1]) {
             $image = imagecreatetruecolor($width, $height);
             imagecopyresized($image, $this->image, 0, 0, 0, 0, $width, $height, $this->atributes[0], $this->atributes[1]);
+            $this->image = $image;
         }
-            
+
+        return $this;
+    }
+
+    /**
+     * Output Image to the browser.
+     *
+     * @return bool
+     */
+    public function render(): bool
+    {
         header("Content-type: {$this->atributes['mime']}");
-        return $this->renderImage($image);
+
+        return $this->renderImage($this->image);
     }
 
     /**
@@ -65,10 +89,16 @@ abstract class Image
      * @param string $imgPath
      *
      * @return string
+     *
+     * @trow \Exception
      */
-    public static function getFileExtention($imgPath): string
+    final public static function getFileExtention($imgPath): string
     {
-        return strtoupper(substr($imgPath, -3));
+        if (!file_exists($imgPath)) {
+            throw new \Exception("Can't find a file in {$imgPath}");
+        }
+
+        return strtoupper(substr($imgPath, strrpos($imgPath, '.') + 1));
     }
 
     abstract protected function loadImage(string $imgPath);
